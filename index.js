@@ -48,16 +48,56 @@ app.use(methodOverride('_method'));
  * ===================================
  */
 
+ /// POKEMON EDIT!
+
 app.get('/:id/edit', (request, response) => {
 
-  // running this will let express to run home.handlebars file in your views folder
-  response.render('editForm')
+  jsonfile.readFile(FILE, (err, obj) => {
+    // obj is the object from the pokedex json file
+    // extract input data from request
+    let inputId = request.params.id
+
+    var pokemon = obj.pokemon.find((currentPokemon) => {
+      return currentPokemon.id === parseInt(inputId, 10);
+    });
+    // console.log(pokemon);
+
+    var context = {
+      pokemon: pokemon
+    }
+
+    // running this will let express to run home.handlebars file in your views folder
+    response.render('editForm', context)
+
+   });
 })
 
+app.put("/pokemon/:id", (request, response) => {
+    
+    jsonfile.readFile(FILE, (err, obj) => {
+
+    let inputId = request.params.id
+    inputId = parseInt(inputId)    
+    let pokeIndex = obj.pokemon[inputId]
+    let newValue = request.body
+
+    console.log(newValue);
+
+    //obj["pokemon"][index - 1] = newValue
+
+    // const newThing = obj
+    
+    // jsonfile.writeFile('pokedex.json', newThing, (err) => {
+    //   console.error(err);
+    // })
+  })
+    respone.send('pokemon updated!')
+});
 
 
 
-//// pokemon search portion
+
+//// POKEMON SEARCH!
 
 
 app.get('/:id', (request, response) => {
@@ -85,6 +125,11 @@ app.get('/:id', (request, response) => {
     }
   });
 });
+
+
+
+
+//// POKEMON DELETE
 
 app.get('/:id/delete', (request, response) => {
 
@@ -116,8 +161,6 @@ app.delete("/pokemon/:id", (request, response) => {
     // extract input data from request
     let inputId = request.params.id
     inputId = parseInt(inputId)
-    
-    console.log(obj.pokemon[inputId-1]);
 
     obj.pokemon.splice(inputId - 1 ,1)
 
@@ -136,7 +179,7 @@ app.delete("/pokemon/:id", (request, response) => {
 
 
 
-//// New Pokemon creation portion
+//// POKEMOON CREATION
 
 app.get('/pokemon/new', (request, response) => {
   // running this will let express to run home.handlebars file in your views folder
