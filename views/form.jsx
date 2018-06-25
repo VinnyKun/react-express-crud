@@ -39,7 +39,7 @@ class NewPokemon extends React.Component {
 				  		
 				  		<input type="submit" value="Submit"/>
 
-				  		</form>
+				  	</form>
 
 				  	</div>	
 

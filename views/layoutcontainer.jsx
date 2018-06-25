@@ -5,6 +5,7 @@ class LayoutContainer extends React.Component {
 
     return (
     	<html>
+    		<head ><title> {this.props.title}</title> </head>
 	    	<body>
 	    		<div className="container">
 			    

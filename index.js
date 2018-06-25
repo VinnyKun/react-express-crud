@@ -3,6 +3,7 @@ const jsonfile = require('jsonfile');
 
 const FILE = 'pokedex.json';
 
+
 /**
  * ===================================
  * Configurations and set up
@@ -35,6 +36,11 @@ app.set('views', __dirname + '/views');
 // this line sets react to be the default view engine
 app.set('view engine', 'jsx');
 
+// Set up method-override for PUT and DELETE forms
+const methodOverride = require('method-override')
+
+app.use(methodOverride('_method'));
+
 
 /**
  * ===================================
@@ -42,11 +48,17 @@ app.set('view engine', 'jsx');
  * ===================================
  */
 
+app.get('/:id/edit', (request, response) => {
 
-app.get('/pokemon/new', (request, response) => {
   // running this will let express to run home.handlebars file in your views folder
-  response.render('form')
+  response.render('editForm')
 })
+
+
+
+
+//// pokemon search portion
+
 
 app.get('/:id', (request, response) => {
 
@@ -73,6 +85,63 @@ app.get('/:id', (request, response) => {
     }
   });
 });
+
+app.get('/:id/delete', (request, response) => {
+
+  jsonfile.readFile(FILE, (err, obj) => {
+    // obj is the object from the pokedex json file
+    // extract input data from request
+    let inputId = request.params.id
+
+    var pokemon = obj.pokemon.find((currentPokemon) => {
+      return currentPokemon.id === parseInt(inputId, 10);
+    });
+    // console.log(pokemon);
+
+    var context = {
+      pokemon: pokemon
+    }
+
+  // running this will let express to run home.handlebars file in your views folder
+  response.render('deleteForm', context)
+
+   });
+})
+
+app.delete("/pokemon/:id", (request, response) => {
+  //read the file in and write out to it
+  // get json from specified file
+  jsonfile.readFile(FILE, (err, obj) => {
+    // obj is the object from the pokedex json file
+    // extract input data from request
+    let inputId = request.params.id
+    inputId = parseInt(inputId)
+    
+    console.log(obj.pokemon[inputId-1]);
+
+    obj.pokemon.splice(inputId - 1 ,1)
+
+    let updatedPokedex = obj;
+      
+    jsonfile.writeFile(FILE, updatedPokedex, (err) => {
+
+      response.send('pokemon deleted from pokedex!');
+
+      });
+  });
+
+});
+
+
+
+
+
+//// New Pokemon creation portion
+
+app.get('/pokemon/new', (request, response) => {
+  // running this will let express to run home.handlebars file in your views folder
+  response.render('form')
+})
 
 //when the form is submitted, the input is POSTed
 app.post('/pokemon', function(request, response) {
@@ -108,6 +177,10 @@ app.post('/pokemon', function(request, response) {
   })
 
 });
+
+////
+
+
 
 app.get('/', (request, response) => {
   response.send("yay");
