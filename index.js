@@ -78,20 +78,20 @@ app.put("/pokemon/:id", (request, response) => {
 
     let inputId = request.params.id
     inputId = parseInt(inputId)    
-    let pokeIndex = obj.pokemon[inputId]
-    let newValue = request.body
-
-    console.log(newValue);
-
-    //obj["pokemon"][index - 1] = newValue
-
-    // const newThing = obj
     
-    // jsonfile.writeFile('pokedex.json', newThing, (err) => {
-    //   console.error(err);
-    // })
+    //doubts about this.body
+    let changed = request.body
+    console.log(obj.pokemon[inputId - 1])
+    obj.pokemon[inputId - 1] = changed
+    console.log(obj.pokemon[inputId - 1])
+    
+    var newPokedex = obj
+    
+    jsonfile.writeFile('pokedex.json', newPokedex, (err) => {
+      console.error(err);
+    })
   })
-    respone.send('pokemon updated!')
+    response.send('pokemon updated!')
 });
 
 
