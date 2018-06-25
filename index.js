@@ -12,11 +12,41 @@ const FILE = 'pokedex.json';
 // Init express app
 const app = express();
 
+// built-in path module so that we can link to the file
+var path = require('path');
+
+//Allows access to files in public folder
+app.use(express.static('views'));
+
+// tell your app to use the module
+app.use(express.json());
+
+app.use(express.urlencoded({
+  extended: true
+}));
+
+// this line below, sets a layout look to your express project
+const reactEngine = require('express-react-views').createEngine();
+app.engine('jsx', reactEngine);
+
+// this tells express where to look for the view files
+app.set('views', __dirname + '/views');
+
+// this line sets react to be the default view engine
+app.set('view engine', 'jsx');
+
+
 /**
  * ===================================
  * Routes
  * ===================================
  */
+
+
+app.get('/pokemon/new', (request, response) => {
+  // running this will let express to run home.handlebars file in your views folder
+  response.render('form')
+})
 
 app.get('/:id', (request, response) => {
 
@@ -42,6 +72,41 @@ app.get('/:id', (request, response) => {
       response.send(pokemon);
     }
   });
+});
+
+//when the form is submitted, the input is POSTed
+app.post('/pokemon', function(request, response) {
+  
+  //debug code (output request body)
+  console.log(request.body);
+
+  //reads Json file
+  jsonfile.readFile(FILE, (err,obj) => {
+    
+    let newPoke = {
+            "id": parseInt(request.body.id),
+            "num": request.body.num,
+            "name": request.body.name,
+            "img": request.body.img,
+            "height": request.body.height,
+            "weight": request.body.weight,
+    }
+    
+    //adds new object into pokemon's array
+    obj.pokemon.push(newPoke)
+    
+    //to make sure var pokemon does not get overwritten
+    let updatedPokedex = obj;
+
+    //Updates Json file
+    jsonfile.writeFile(FILE, updatedPokedex, (err) => {
+
+      response.send('pokemon added to pokedex!');
+
+      });
+
+  })
+
 });
 
 app.get('/', (request, response) => {
